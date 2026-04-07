@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block title %}Login — CollabSpace{% endblock %}
+{% block content %}
+<div class="auth-wrap">
+  <div class="auth-box">
+    <div class="auth-header">
+      <div class="auth-tag">CollabSpace</div>
+      <div class="auth-title">Welcome <em>back.</em></div>
+      <div class="auth-sub">Sign in to your account.</div>
+    </div>
+    <form method="post">
+      {% csrf_token %}
+      <div class="form-group">
+        <label>Username</label>
+        <input type="text" name="username" required>
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" name="password" required>
+      </div>
+      <button class="btn btn-primary" style="width:100%;margin-top:8px" type="submit">Sign in →</button>
+    </form>
+    <div class="auth-footer">No account? <a href="{% url 'register' %}">Register free</a></div>
+  </div>
+</div>
+{% endblock %}

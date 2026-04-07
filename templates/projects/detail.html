@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+{% block title %}{{ project.title }} — CollabSpace{% endblock %}
+{% block content %}
+<div class="detail-wrap">
+  <div class="container">
+    <a class="detail-back" href="{% url 'browse_projects' %}">← Back to browse</a>
+    <div class="detail-header">
+      <div class="detail-title">{{ project.title }}</div>
+      <div class="detail-meta">
+        <div class="detail-meta-item">📅 {{ project.duration }} months</div>
+        <div class="detail-meta-item">👤 {{ project.creator.get_full_name|default:project.creator.username }}</div>
+        {% if project.is_tech %}<span class="badge badge-tech">Tech</span>{% endif %}
+        {% if project.is_non_tech %}<span class="badge badge-nontech">Non-tech</span>{% endif %}
+        {% if project.is_paid %}<span class="badge badge-paid">Paid</span>{% endif %}
+        {% if project.is_unpaid %}<span class="badge badge-unpaid">Unpaid</span>{% endif %}
+        {% if project.is_part_time %}<span class="badge badge-parttime">Part-time</span>{% endif %}
+        {% if project.is_full_time %}<span class="badge badge-fulltime">Full-time</span>{% endif %}
+      </div>
+      {% if user == project.creator %}
+        <div style="display:flex;gap:10px;margin-top:8px">
+          <a class="btn btn-ghost btn-sm" href="{% url 'edit_project' project.pk %}">✏️ Edit</a>
+          <a class="btn btn-danger btn-sm" href="{% url 'delete_project' project.pk %}">🗑 Delete</a>
+          <a class="btn btn-outline btn-sm" href="{% url 'manage_applications' project.pk %}">📋 View Applications</a>
+        </div>
+      {% endif %}
+    </div>
+
+    <div class="detail-body">
+      <div>
+        <div class="detail-desc">
+          <h3>About this project</h3>
+          <p>{{ project.description }}</p>
+        </div>
+      </div>
+      <div class="detail-sidebar">
+        <div class="sidebar-card">
+          <h3>Open roles</h3>
+          {% for role in roles %}
+            <div class="role-apply-row">
+              <div>
+                <div class="role-apply-name">{{ role.role_name }}</div>
+                {% if role.is_filled %}
+                  <div class="role-apply-status" style="color:var(--accent)">Filled ✓</div>
+                {% else %}
+                  <div class="role-apply-status">Open</div>
+                {% endif %}
+              </div>
+              {% if user.is_authenticated and user != project.creator %}
+                {% if role.pk in applied_role_ids %}
+                  <button class="btn btn-outline btn-sm" disabled style="opacity:0.5">Applied</button>
+                {% elif role.is_filled %}
+                  <button class="btn btn-outline btn-sm" disabled style="opacity:0.4">Filled</button>
+                {% else %}
+                  <a class="btn btn-primary btn-sm" href="{% url 'apply_to_role' role.pk %}">Apply</a>
+                {% endif %}
+              {% endif %}
+            </div>
+          {% endfor %}
+        </div>
+        <div class="sidebar-card">
+          <h3>Project info</h3>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <div style="display:flex;justify-content:space-between;font-size:13px">
+              <span style="color:var(--text3)">Duration</span>
+              <span>{{ project.duration }} months</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:13px">
+              <span style="color:var(--text3)">Posted</span>
+              <span>{{ project.created_at|date:"M d, Y" }}</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:13px">
+              <span style="color:var(--text3)">Creator</span>
+              <span>{{ project.creator.get_full_name|default:project.creator.username }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

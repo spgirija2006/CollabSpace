@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+{% block title %}My Applications — CollabSpace{% endblock %}
+{% block content %}
+<div class="myapps-wrap">
+  <div class="container">
+    <div class="section-head" style="margin-bottom:32px">
+      <div class="section-title" style="font-family:'DM Serif Display',serif;font-size:32px;letter-spacing:-1px">My applications</div>
+      <div class="section-count">{{ applications.count }} total</div>
+    </div>
+    <div class="apps-list">
+      {% for app in applications %}
+        <div class="app-card" style="flex-direction:column;align-items:flex-start;gap:12px">
+          <div style="display:flex;align-items:center;gap:20px;width:100%">
+            <div class="app-status-bar status-{{ app.status }}"></div>
+            <div class="app-card-info">
+              <div class="app-card-role">{{ app.role.role_name }}</div>
+              <div class="app-card-project">{{ app.project.title }}</div>
+            </div>
+            <span class="badge badge-{{ app.status }}" style="margin-left:auto">{{ app.get_status_display }}</span>
+            <div class="app-card-date">{{ app.applied_at|date:"M d, Y" }}</div>
+            <a class="btn btn-ghost btn-sm" href="{% url 'project_detail' app.project.pk %}">View project</a>
+          </div>
+
+          {% if app.status == 'shortlisted' %}
+            <div style="width:100%;padding:14px 18px;background:rgba(184,126,255,0.08);border:1px solid rgba(184,126,255,0.2);border-radius:var(--radius-sm)">
+              <div style="font-size:12px;color:var(--purple);font-family:'DM Mono',monospace;margin-bottom:8px">⭐ YOU ARE SHORTLISTED</div>
+              <div style="font-size:13px;color:var(--text2)">
+                The creator will contact you to arrange an interview. Their contact details:<br><br>
+                <span style="color:var(--text)">📧 {{ app.project.creator.email }}</span><br>
+                {% if app.project.creator.profile.phone_number %}
+                  <span style="color:var(--text)">📱 {{ app.project.creator.profile.phone_number }}</span>
+                {% endif %}
+              </div>
+            </div>
+
+          {% elif app.status == 'interview_scheduled' %}
+            <div style="width:100%;padding:14px 18px;background:rgba(95,159,255,0.08);border:1px solid rgba(95,159,255,0.2);border-radius:var(--radius-sm)">
+              <div style="font-size:12px;color:var(--blue);font-family:'DM Mono',monospace;margin-bottom:8px">📅 INTERVIEW SCHEDULED</div>
+              <div style="font-size:13px;color:var(--text);display:flex;flex-direction:column;gap:4px">
+                <span>📅 Date: {{ app.interview_date }}</span>
+                <span>🕐 Time: {{ app.interview_time }}</span>
+                <span>🔗 Link: <a href="{{ app.interview_link }}" target="_blank" style="color:var(--blue)">{{ app.interview_link }}</a></span>
+                {% if app.interview_notes %}
+                  <span>📝 Notes: {{ app.interview_notes }}</span>
+                {% endif %}
+              </div>
+            </div>
+
+          {% elif app.status == 'accepted' %}
+            <div style="width:100%;padding:14px 18px;background:var(--accent-dim);border:1px solid rgba(200,245,90,0.2);border-radius:var(--radius-sm)">
+              <div style="font-size:12px;color:var(--accent);font-family:'DM Mono',monospace;margin-bottom:8px">🎉 ACCEPTED — CREATOR CONTACT</div>
+              <div style="font-size:13px;color:var(--text);display:flex;flex-direction:column;gap:4px">
+                <span>👤 {{ app.project.creator.get_full_name|default:app.project.creator.username }}</span>
+                <span>📧 {{ app.project.creator.email }}</span>
+                {% if app.project.creator.profile.phone_number %}
+                  <span>📱 {{ app.project.creator.profile.phone_number }}</span>
+                {% endif %}
+              </div>
+            </div>
+
+          {% elif app.status == 'rejected' %}
+            <div style="width:100%;padding:12px 18px;background:rgba(255,95,95,0.06);border:1px solid rgba(255,95,95,0.15);border-radius:var(--radius-sm)">
+              <div style="font-size:13px;color:var(--text2)">Your application was not selected. Keep applying to other projects!</div>
+            </div>
+          {% endif %}
+
+        </div>
+      {% empty %}
+        <div class="empty-state">
+          <span>📨</span>
+          You haven't applied to any projects yet.
+          <a href="{% url 'browse_projects' %}" style="color:var(--accent)">Browse projects</a>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock %}

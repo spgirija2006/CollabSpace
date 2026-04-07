@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+{% block title %}Edit Project — CollabSpace{% endblock %}
+{% block content %}
+<div class="create-wrap">
+  <div class="container">
+    <a class="detail-back" href="{% url 'project_detail' project.pk %}">← Back to project</a>
+    <div class="create-header">
+      <div class="create-title">Edit project</div>
+      <div class="create-sub">Update your project details and roles.</div>
+    </div>
+    <form method="post" style="max-width:640px">
+      {% csrf_token %}
+
+      <div class="form-card" style="margin-bottom:16px">
+        <h3>Project details</h3>
+        <div class="form-group">
+          <label>Project title</label>
+          <input type="text" name="title" value="{{ project.title }}" required>
+        </div>
+        <div class="form-group">
+          <label>Description</label>
+          <textarea name="description" rows="5" required>{{ project.description }}</textarea>
+        </div>
+        <div class="form-group">
+          <label>Duration (months)</label>
+          <input type="number" name="duration" value="{{ project.duration }}" style="max-width:120px">
+        </div>
+      </div>
+
+      <div class="form-card" style="margin-bottom:16px">
+        <h3>Categories</h3>
+        <div class="form-group">
+          <label>Domain</label>
+          <div style="display:flex;gap:10px;flex-wrap:wrap">
+            <label class="checkbox-row"><input type="checkbox" name="is_tech" {% if project.is_tech %}checked{% endif %}><span>Tech</span></label>
+            <label class="checkbox-row"><input type="checkbox" name="is_non_tech" {% if project.is_non_tech %}checked{% endif %}><span>Non-tech</span></label>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Compensation</label>
+          <div style="display:flex;gap:10px;flex-wrap:wrap">
+            <label class="checkbox-row"><input type="checkbox" name="is_paid" {% if project.is_paid %}checked{% endif %}><span>Paid</span></label>
+            <label class="checkbox-row"><input type="checkbox" name="is_unpaid" {% if project.is_unpaid %}checked{% endif %}><span>Unpaid</span></label>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Time commitment</label>
+          <div style="display:flex;gap:10px;flex-wrap:wrap">
+            <label class="checkbox-row"><input type="checkbox" name="is_part_time" {% if project.is_part_time %}checked{% endif %}><span>Part-time</span></label>
+            <label class="checkbox-row"><input type="checkbox" name="is_full_time" {% if project.is_full_time %}checked{% endif %}><span>Full-time</span></label>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-card" style="margin-bottom:16px">
+        <h3>Roles needed</h3>
+        <div id="roles-container">
+          {% for role in existing_roles %}
+            <div class="role-input-row">
+              <input type="text" name="role_names" value="{{ role.role_name }}" required>
+              <button type="button" class="remove-role" onclick="this.parentElement.remove()">×</button>
+            </div>
+          {% empty %}
+            <div class="role-input-row">
+              <input type="text" name="role_names" placeholder="e.g. Frontend Developer" required>
+            </div>
+          {% endfor %}
+        </div>
+        <button type="button" class="btn btn-ghost btn-sm" style="margin-top:12px" onclick="addRole()">+ Add another role</button>
+      </div>
+
+      {% if form.errors %}
+        <div style="color:var(--red);font-size:13px;margin-bottom:12px">{{ form.errors }}</div>
+      {% endif %}
+
+      <div style="display:flex;gap:12px">
+        <a class="btn btn-outline" href="{% url 'project_detail' project.pk %}">Cancel</a>
+        <button class="btn btn-primary" style="flex:1" type="submit">Save changes →</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<style>
+.role-input-row { display:flex; gap:8px; align-items:center; margin-bottom:10px; }
+.role-input-row input { flex:1; }
+.remove-role { background:none; border:none; color:var(--red); font-size:20px; cursor:pointer; padding:0 6px; flex-shrink:0; line-height:1; }
+</style>
+<script>
+function addRole() {
+  const container = document.getElementById('roles-container');
+  const row = document.createElement('div');
+  row.className = 'role-input-row';
+  row.innerHTML = `
+    <input type="text" name="role_names" placeholder="e.g. UI/UX Designer">
+    <button type="button" class="remove-role" onclick="this.parentElement.remove()">×</button>
+  `;
+  container.appendChild(row);
+  row.querySelector('input').focus();
+}
+</script>
+{% endblock %}

@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+{% block title %}Browse Projects — CollabSpace{% endblock %}
+{% block content %}
+<div class="browse-wrap">
+  <div class="container">
+    <div class="browse-hero">
+      <div class="browse-title">Find your next <em>project.</em></div>
+      <div class="browse-sub">Browse open roles and apply to the ones that excite you.</div>
+    </div>
+
+    <form method="get">
+      <div class="search-bar">
+        <div class="search-input-wrap">
+          <span class="search-icon">🔍</span>
+          <input type="text" name="q" value="{{ query }}" placeholder="Search projects, roles, keywords...">
+        </div>
+        <button class="btn btn-primary" type="submit">Search</button>
+      </div>
+      <div class="filter-bar">
+        <span class="filter-label">Filter:</span>
+        <button type="submit" name="tech" value="1" class="filter-toggle {% if request.GET.tech %}active{% endif %}">Tech</button>
+        <button type="submit" name="non_tech" value="1" class="filter-toggle {% if request.GET.non_tech %}active{% endif %}">Non-tech</button>
+        <button type="submit" name="paid" value="1" class="filter-toggle {% if request.GET.paid %}active{% endif %}">Paid</button>
+        <button type="submit" name="unpaid" value="1" class="filter-toggle {% if request.GET.unpaid %}active{% endif %}">Unpaid</button>
+        <button type="submit" name="part_time" value="1" class="filter-toggle {% if request.GET.part_time %}active{% endif %}">Part-time</button>
+        <button type="submit" name="full_time" value="1" class="filter-toggle {% if request.GET.full_time %}active{% endif %}">Full-time</button>
+        <a href="{% url 'browse_projects' %}" class="btn btn-ghost btn-sm" style="margin-left:auto">Clear all</a>
+      </div>
+    </form>
+
+    <div class="project-grid">
+      {% for project in projects %}
+        <div class="project-card" onclick="window.location='{% url 'project_detail' project.pk %}'">
+          <div class="project-card-head">
+            <div class="project-card-title">{{ project.title }}</div>
+            <div class="project-card-duration">{{ project.duration }}mo</div>
+          </div>
+          <div class="project-card-desc">{{ project.description|truncatewords:25 }}</div>
+          <div class="project-card-badges">
+            {% if project.is_tech %}<span class="badge badge-tech">Tech</span>{% endif %}
+            {% if project.is_non_tech %}<span class="badge badge-nontech">Non-tech</span>{% endif %}
+            {% if project.is_paid %}<span class="badge badge-paid">Paid</span>{% endif %}
+            {% if project.is_unpaid %}<span class="badge badge-unpaid">Unpaid</span>{% endif %}
+            {% if project.is_part_time %}<span class="badge badge-parttime">Part-time</span>{% endif %}
+            {% if project.is_full_time %}<span class="badge badge-fulltime">Full-time</span>{% endif %}
+          </div>
+          <div class="project-card-roles">
+            {% for role in project.roles.all %}
+              <div class="role-chip {% if role.is_filled %}filled{% endif %}">
+                <div class="role-chip-dot"></div>
+                {{ role.role_name }}{% if role.is_filled %} ✓{% endif %}
+              </div>
+            {% endfor %}
+          </div>
+          <div class="project-card-creator">
+            <div class="avatar-xs">{{ project.creator.username|first|upper }}</div>
+            {{ project.creator.get_full_name|default:project.creator.username }}
+          </div>
+        </div>
+      {% empty %}
+        <div style="grid-column:1/-1">
+          <div class="empty-state"><span>🔍</span>No projects found.</div>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock %}

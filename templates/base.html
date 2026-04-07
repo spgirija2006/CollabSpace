@@ -1,0 +1,88 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}CollabSpace{% endblock %}</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/main.css' %}">
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="{% url 'browse_projects' %}">CollabSpace <span>/ find your team</span></a>
+  <a class="nav-link {% if request.resolver_match.url_name == 'browse_projects' %}active{% endif %}" href="{% url 'browse_projects' %}">Browse</a>
+  {% if user.is_authenticated %}
+    <a class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}" href="{% url 'dashboard' %}">Dashboard</a>
+    <a class="nav-link {% if request.resolver_match.url_name == 'my_applications' %}active{% endif %}" href="{% url 'my_applications' %}">My Applications</a>
+    <div class="nav-spacer"></div>
+    <a class="nav-plus" href="{% url 'create_project' %}" title="New Project">+</a>
+    <a class="nav-btn" href="{% url 'profile' %}">Profile</a>
+    <form method="post" action="{% url 'logout' %}" style="display:inline">
+      {% csrf_token %}
+      <button type="submit" class="nav-btn">Logout</button>
+    </form>
+  {% else %}
+    <div class="nav-spacer"></div>
+    <a class="nav-btn" href="{% url 'login' %}">Login</a>
+    <a class="nav-btn primary" href="{% url 'register' %}">Register</a>
+  {% endif %}
+</nav>
+
+{% if messages %}
+  <div class="messages-wrap">
+    {% for message in messages %}
+      <div class="message message-{{ message.tags }}">{{ message }}</div>
+    {% endfor %}
+  </div>
+{% endif %}
+
+<main>
+  {% block content %}{% endblock %}
+</main>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <div class="footer-logo">CollabSpace</div>
+      <div class="footer-tagline">Find your team. Build something real.</div>
+    </div>
+    <div class="footer-links-group">
+      <div class="footer-col">
+        <div class="footer-col-title">Platform</div>
+        <a href="{% url 'browse_projects' %}">Browse projects</a>
+        <a href="{% url 'create_project' %}">Post a project</a>
+        <a href="{% url 'my_applications' %}">My applications</a>
+        <a href="{% url 'dashboard' %}">Dashboard</a>
+      </div>
+      <div class="footer-col">
+        <div class="footer-col-title">Account</div>
+        {% if user.is_authenticated %}
+          <a href="{% url 'profile' %}">My profile</a>
+          <form method="post" action="{% url 'logout' %}">
+            {% csrf_token %}
+            <button type="submit" class="footer-logout">Logout</button>
+          </form>
+        {% else %}
+          <a href="{% url 'login' %}">Sign in</a>
+          <a href="{% url 'register' %}">Register free</a>
+        {% endif %}
+      </div>
+      <div class="footer-col">
+        <div class="footer-col-title">Built with</div>
+        <span class="footer-info-item">Django 6.0.3</span>
+        <span class="footer-info-item">Python 3.14</span>
+        <span class="footer-info-item">SQLite</span>
+        <span class="footer-info-item">Vanilla JS</span>
+      </div>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2025 CollabSpace — A course project</span>
+    <span class="footer-disclaimer">This platform is a mediator only. Not responsible for payments, work quality, or disputes between users.</span>
+  </div>
+</footer>
+
+</body>
+</html>

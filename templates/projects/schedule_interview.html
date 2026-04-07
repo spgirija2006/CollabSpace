@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% block title %}Schedule Interview — CollabSpace{% endblock %}
+{% block content %}
+<div class="apply-wrap">
+  <div class="container">
+    <a class="detail-back" href="{% url 'manage_applications' application.project.pk %}">← Back to applications</a>
+    <div class="apply-box">
+      <div class="auth-title" style="margin-bottom:8px">Schedule an interview</div>
+      <div style="color:var(--text2);font-size:14px;margin-bottom:24px">
+        For <strong style="color:var(--text)">{{ application.applicant.get_full_name|default:application.applicant.username }}</strong>
+        → <strong style="color:var(--text)">{{ application.role.role_name }}</strong>
+      </div>
+
+      <div class="form-card">
+        <h3>Interview details</h3>
+        <form method="post">
+          {% csrf_token %}
+          <div class="form-row">
+            <div class="form-group">
+              <label>Date</label>
+              <input type="date" name="interview_date" required>
+            </div>
+            <div class="form-group">
+              <label>Time</label>
+              <input type="time" name="interview_time" required>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Meeting link <span style="color:var(--text3)">(Google Meet, Zoom, etc.)</span></label>
+            <input type="url" name="interview_link" required placeholder="https://meet.google.com/xxx-xxxx-xxx">
+          </div>
+          <div class="form-group">
+            <label>Notes <span style="color:var(--text3)">(optional)</span></label>
+            <textarea name="interview_notes" rows="3" placeholder="Topics to cover, things to prepare, etc."></textarea>
+          </div>
+          <div style="display:flex;gap:12px;margin-top:8px">
+            <a class="btn btn-outline" href="{% url 'manage_applications' application.project.pk %}">Cancel</a>
+            <button class="btn btn-primary" style="flex:1" type="submit">Send interview invite →</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

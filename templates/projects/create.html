@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+{% block title %}Create Project — CollabSpace{% endblock %}
+{% block content %}
+<div class="create-wrap">
+  <div class="container">
+    <div class="create-header">
+      <div class="create-title">Post a project</div>
+      <div class="create-sub">Describe your project and the roles you're looking to fill.</div>
+    </div>
+    <form method="post" style="max-width:640px">
+      {% csrf_token %}
+
+      <div class="form-card" style="margin-bottom:16px">
+        <h3>Project details</h3>
+        <div class="form-group">
+          <label>Project title</label>
+          <input type="text" name="title" required placeholder="e.g. EcoTrack — Carbon footprint app">
+        </div>
+        <div class="form-group">
+          <label>Description</label>
+          <textarea name="description" rows="5" required placeholder="What are you building? What kind of collaborators are you looking for?"></textarea>
+        </div>
+        <div class="form-group">
+          <label>Duration (months)</label>
+          <input type="number" name="duration" min="1" max="24" required placeholder="3" style="max-width:120px">
+        </div>
+      </div>
+
+      <div class="form-card" style="margin-bottom:16px">
+        <h3>Categories</h3>
+        <div class="form-group">
+          <label>Domain</label>
+          <div style="display:flex;gap:10px;flex-wrap:wrap">
+            <label class="checkbox-row"><input type="checkbox" name="is_tech"><span>Tech</span></label>
+            <label class="checkbox-row"><input type="checkbox" name="is_non_tech"><span>Non-tech</span></label>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Compensation</label>
+          <div style="display:flex;gap:10px;flex-wrap:wrap">
+            <label class="checkbox-row"><input type="checkbox" name="is_paid"><span>Paid</span></label>
+            <label class="checkbox-row"><input type="checkbox" name="is_unpaid"><span>Unpaid</span></label>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Time commitment</label>
+          <div style="display:flex;gap:10px;flex-wrap:wrap">
+            <label class="checkbox-row"><input type="checkbox" name="is_part_time"><span>Part-time</span></label>
+            <label class="checkbox-row"><input type="checkbox" name="is_full_time"><span>Full-time</span></label>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-card" style="margin-bottom:16px">
+        <h3>Roles needed</h3>
+        <div id="roles-container">
+          <div class="role-input-row">
+            <input type="text" name="role_names" placeholder="e.g. Frontend Developer" required>
+          </div>
+        </div>
+        <button type="button" class="btn btn-ghost btn-sm" style="margin-top:12px" onclick="addRole()">+ Add another role</button>
+      </div>
+
+      {% if form.errors %}
+        <div style="color:var(--red);font-size:13px;margin-bottom:12px">{{ form.errors }}</div>
+      {% endif %}
+
+      <div style="display:flex;gap:12px">
+        <a class="btn btn-outline" href="{% url 'dashboard' %}">Cancel</a>
+        <button class="btn btn-primary" style="flex:1" type="submit">Post project →</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<style>
+.role-input-row { display:flex; gap:8px; align-items:center; margin-bottom:10px; }
+.role-input-row input { flex:1; }
+.remove-role { background:none; border:none; color:var(--red); font-size:20px; cursor:pointer; padding:0 6px; flex-shrink:0; line-height:1; }
+</style>
+<script>
+function addRole() {
+  const container = document.getElementById('roles-container');
+  const row = document.createElement('div');
+  row.className = 'role-input-row';
+  row.innerHTML = `
+    <input type="text" name="role_names" placeholder="e.g. UI/UX Designer">
+    <button type="button" class="remove-role" onclick="this.parentElement.remove()">×</button>
+  `;
+  container.appendChild(row);
+  row.querySelector('input').focus();
+}
+</script>
+{% endblock %}

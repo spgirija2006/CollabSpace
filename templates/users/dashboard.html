@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard — CollabSpace{% endblock %}
+{% block content %}
+<div class="dash-wrap">
+  <div class="container">
+    <div class="dash-hero">
+      <div>
+        <div class="dash-greeting">Hey, <em>{{ user.first_name|default:user.username }}</em> 👋
+          <small>Here's what's happening with your projects</small>
+        </div>
+      </div>
+      <a class="btn btn-primary" href="{% url 'create_project' %}">+ New project</a>
+    </div>
+
+    <div class="dash-stats">
+      <div class="stat-card">
+        <div class="stat-num">{{ user_projects.count }}</div>
+        <div class="stat-label">Projects posted</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num">{{ user_applications.count }}</div>
+        <div class="stat-label">Applications sent</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num">{{ user_projects|length }}</div>
+        <div class="stat-label">Active projects</div>
+      </div>
+    </div>
+
+    <div class="dash-grid">
+      <div class="card">
+        <div class="section-head">
+          <div class="section-title">My projects</div>
+          <div class="section-count">{{ user_projects.count }}</div>
+        </div>
+        {% for project in user_projects %}
+          <div class="project-row">
+            <div class="project-row-dot"></div>
+            <div>
+              <div class="project-row-name">
+                <a href="{% url 'project_detail' project.pk %}" style="color:inherit;text-decoration:none">{{ project.title }}</a>
+              </div>
+              <div class="project-row-meta">{{ project.duration }} months · {{ project.roles.count }} roles</div>
+            </div>
+            <a class="btn btn-ghost btn-sm" href="{% url 'manage_applications' project.pk %}">Manage</a>
+          </div>
+        {% empty %}
+          <div class="empty-state"><span>📋</span>No projects yet.</div>
+        {% endfor %}
+        <a class="btn btn-outline btn-sm" style="margin-top:16px;width:100%" href="{% url 'create_project' %}">+ Post new project</a>
+      </div>
+
+      <div class="card">
+        <div class="section-head">
+          <div class="section-title">My applications</div>
+          <div class="section-count">{{ user_applications.count }}</div>
+        </div>
+        {% for app in user_applications %}
+          <div class="app-row">
+            <div>
+              <div style="font-size:14px;font-weight:500">{{ app.role.role_name }}</div>
+              <div class="app-row-proj">{{ app.project.title }}</div>
+            </div>
+            <span class="badge badge-{{ app.status }}" style="margin-left:auto">{{ app.get_status_display }}</span>
+          </div>
+        {% empty %}
+          <div class="empty-state"><span>📨</span>No applications yet.</div>
+        {% endfor %}
+        <a class="btn btn-outline btn-sm" style="margin-top:16px;width:100%" href="{% url 'my_applications' %}">View all</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

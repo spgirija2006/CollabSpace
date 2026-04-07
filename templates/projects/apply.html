@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% block title %}Apply — CollabSpace{% endblock %}
+{% block content %}
+<div class="apply-wrap">
+  <div class="container">
+    <a class="detail-back" href="{% url 'project_detail' project.pk %}">← Back to project</a>
+    <div class="apply-box">
+      <div class="auth-title" style="margin-bottom:24px">Apply for this role</div>
+      <div class="apply-context">
+        <div class="apply-context-icon">💻</div>
+        <div>
+          <div class="apply-context-role">{{ role.role_name }}</div>
+          <div class="apply-context-proj">{{ project.title }}</div>
+        </div>
+      </div>
+      <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="form-card">
+          <h3>Your application</h3>
+          <div class="form-group">
+            <label>Cover letter / application message</label>
+            <textarea name="application_message" rows="6" required placeholder="Why are you a great fit for this role?"></textarea>
+          </div>
+          <div class="form-group">
+            <label>Resume (PDF)</label>
+            <input type="file" name="resume" accept=".pdf" required>
+          </div>
+          {% if form.errors %}
+            <div style="color:var(--red);font-size:13px;margin-bottom:12px">{{ form.errors }}</div>
+          {% endif %}
+          <div style="display:flex;gap:12px;margin-top:8px">
+            <a class="btn btn-outline" href="{% url 'project_detail' project.pk %}">Cancel</a>
+            <button class="btn btn-primary" style="flex:1" type="submit">Submit application →</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+{% block title %}Manage Applications — CollabSpace{% endblock %}
+{% block content %}
+<div class="manage-wrap">
+  <div class="container">
+    <a class="detail-back" href="{% url 'dashboard' %}">← Back to dashboard</a>
+    <div class="section-head" style="margin-bottom:32px">
+      <div class="section-title" style="font-family:'DM Serif Display',serif;font-size:32px;letter-spacing:-1px">Applications</div>
+      <div class="section-count">{{ project.title }}</div>
+    </div>
+
+    {% for role in roles %}
+      <div class="role-section">
+        <div class="role-section-head">
+          <div class="role-section-name">{{ role.role_name }}</div>
+          <div class="role-section-count">{{ role.applications.count }} applicant{{ role.applications.count|pluralize }}</div>
+          <div class="role-section-filled">{% if role.is_filled %}Filled ✓{% else %}Open{% endif %}</div>
+        </div>
+
+        {% for app in role.applications.all %}
+          <div class="applicant-row" style="flex-direction:column;align-items:flex-start;gap:12px">
+            <div style="display:flex;align-items:center;gap:16px;width:100%">
+              <div class="applicant-avatar" style="background:linear-gradient(135deg,#5f9fff,#b87eff)">
+                {{ app.applicant.username|first|upper }}
+              </div>
+              <div class="applicant-info">
+                <div class="applicant-name">{{ app.applicant.get_full_name|default:app.applicant.username }}</div>
+                <div class="applicant-msg">{{ app.application_message|truncatewords:15 }}</div>
+              </div>
+              <span class="badge badge-{{ app.status }}" style="margin-left:auto">{{ app.get_status_display }}</span>
+              {% if app.resume %}
+                <a href="{{ app.resume.url }}" class="resume-link" target="_blank">📄 Resume</a>
+              {% endif %}
+            </div>
+
+            <!-- Action buttons based on status -->
+            <div style="display:flex;gap:8px;flex-wrap:wrap;padding-left:52px">
+              {% if app.status == 'pending' %}
+                <a class="btn btn-sm" style="background:rgba(184,126,255,0.12);color:var(--purple);border:1px solid rgba(184,126,255,0.3)" href="{% url 'update_application_status' app.pk 'shortlisted' %}">⭐ Shortlist</a>
+                <a class="btn btn-reject btn-sm" href="{% url 'update_application_status' app.pk 'rejected' %}">✕ Reject</a>
+
+              {% elif app.status == 'shortlisted' %}
+                <div style="font-size:12px;color:var(--text2);padding:6px 0">
+                  ⭐ Shortlisted — contact details sent to applicant
+                </div>
+                <a class="btn btn-sm" style="background:rgba(95,159,255,0.12);color:var(--blue);border:1px solid rgba(95,159,255,0.3)" href="{% url 'schedule_interview' app.pk %}">📅 Schedule Interview</a>
+                <a class="btn btn-accept btn-sm" href="{% url 'update_application_status' app.pk 'accepted' %}">✓ Accept directly</a>
+                <a class="btn btn-reject btn-sm" href="{% url 'update_application_status' app.pk 'rejected' %}">✕ Reject</a>
+
+              {% elif app.status == 'interview_scheduled' %}
+                <div style="padding:10px 14px;background:rgba(95,159,255,0.08);border:1px solid rgba(95,159,255,0.2);border-radius:var(--radius-sm);font-size:13px;width:100%">
+                  <div style="color:var(--blue);font-family:'DM Mono',monospace;font-size:11px;margin-bottom:6px">INTERVIEW SCHEDULED</div>
+                  <div style="color:var(--text);display:flex;flex-direction:column;gap:3px">
+                    <span>📅 {{ app.interview_date }}</span>
+                    <span>🕐 {{ app.interview_time }}</span>
+                    <span>🔗 <a href="{{ app.interview_link }}" target="_blank" style="color:var(--blue)">{{ app.interview_link }}</a></span>
+                    {% if app.interview_notes %}<span>📝 {{ app.interview_notes }}</span>{% endif %}
+                  </div>
+                </div>
+                <a class="btn btn-accept btn-sm" href="{% url 'update_application_status' app.pk 'accepted' %}">✓ Accept</a>
+                <a class="btn btn-reject btn-sm" href="{% url 'update_application_status' app.pk 'rejected' %}">✕ Reject</a>
+
+              {% elif app.status == 'accepted' %}
+                <div style="padding:10px 14px;background:var(--accent-dim);border:1px solid rgba(200,245,90,0.2);border-radius:var(--radius-sm);font-size:13px;width:100%">
+                  <div style="color:var(--accent);font-family:'DM Mono',monospace;font-size:11px;margin-bottom:6px">ACCEPTED — CONTACT DETAILS</div>
+                  <div style="color:var(--text);display:flex;flex-direction:column;gap:3px">
+                    <span>📧 {{ app.applicant.email }}</span>
+                    {% if app.applicant.profile.phone_number %}
+                      <span>📱 {{ app.applicant.profile.phone_number }}</span>
+                    {% endif %}
+                  </div>
+                </div>
+
+              {% elif app.status == 'rejected' %}
+                <div style="font-size:12px;color:var(--text3);padding:6px 0">Application rejected.</div>
+              {% endif %}
+            </div>
+          </div>
+        {% empty %}
+          <div class="applicant-row" style="color:var(--text3);font-size:14px">No applications yet for this role.</div>
+        {% endfor %}
+      </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

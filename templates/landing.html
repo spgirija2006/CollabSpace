@@ -1,0 +1,653 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CollabSpace — Find your team</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#08090c;
+  --surface:#0f1015;
+  --border:rgba(255,255,255,0.08);
+  --border2:rgba(255,255,255,0.18);
+  --text:#ffffff;
+  --text2:#cccccc;
+  --text3:#888888;
+  --accent:#c8f55a;
+  --accent2:#a8d540;
+  --red:#ff5f5f;
+  --blue:#5f9fff;
+  --purple:#b87eff;
+  --orange:#ff9f5f;
+}
+html{scroll-behavior:smooth}
+body{
+  font-family:'Outfit',sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  overflow-x:hidden;
+}
+
+/* NOISE */
+body::after{
+  content:'';position:fixed;inset:0;z-index:0;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events:none;opacity:0.5;
+}
+
+/* NAV */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  display:flex;align-items:center;
+  padding:0 48px;height:64px;
+  background:rgba(8,9,12,0.85);
+  backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border);
+}
+.nav-logo{
+  font-family:'DM Serif Display',serif;
+  font-size:20px;font-weight:400;
+  color:var(--accent);letter-spacing:-0.5px;
+  text-decoration:none;margin-right:auto;
+}
+.nav-logo span{color:var(--text3);font-style:italic;font-size:16px}
+.nav-links{display:flex;align-items:center;gap:6px}
+.nav-link{
+  padding:7px 16px;border-radius:8px;
+  color:var(--text2);font-size:14px;font-weight:500;
+  text-decoration:none;transition:all 0.2s;
+}
+.nav-link:hover{color:var(--text);background:rgba(255,255,255,0.07)}
+.nav-cta{
+  padding:8px 20px;border-radius:8px;
+  background:var(--accent);color:#08090c;
+  font-size:14px;font-weight:600;
+  text-decoration:none;transition:all 0.2s;
+  margin-left:6px;
+}
+.nav-cta:hover{background:var(--accent2)}
+
+/* HERO */
+.hero{
+  min-height:100vh;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  padding:120px 48px 80px;
+  position:relative;z-index:1;
+  text-align:center;
+}
+.hero::before{
+  content:'';position:absolute;inset:0;
+  background-image:
+    linear-gradient(rgba(200,245,90,0.04) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(200,245,90,0.04) 1px,transparent 1px);
+  background-size:80px 80px;
+  mask-image:radial-gradient(ellipse 80% 80% at 50% 50%,black 30%,transparent 100%);
+  -webkit-mask-image:radial-gradient(ellipse 80% 80% at 50% 50%,black 30%,transparent 100%);
+}
+.hero-glow{
+  position:absolute;top:20%;left:50%;transform:translateX(-50%);
+  width:600px;height:300px;
+  background:radial-gradient(ellipse,rgba(200,245,90,0.07) 0%,transparent 70%);
+  pointer-events:none;
+}
+.hero-eyebrow{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:6px 16px;border-radius:20px;
+  border:1px solid rgba(200,245,90,0.3);
+  background:rgba(200,245,90,0.07);
+  font-size:12px;font-weight:600;letter-spacing:0.1em;
+  color:var(--accent);text-transform:uppercase;
+  margin-bottom:32px;
+  animation:fadeUp 0.8s ease both;
+}
+.eyebrow-dot{
+  width:6px;height:6px;border-radius:50%;
+  background:var(--accent);
+  animation:pulse 2s ease infinite;
+  flex-shrink:0;
+}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.5;transform:scale(0.8)}}
+.hero-title{
+  font-family:'DM Serif Display',serif;
+  font-size:clamp(48px,8vw,96px);
+  line-height:1.05;letter-spacing:-3px;
+  margin-bottom:28px;
+  animation:fadeUp 0.8s ease 0.1s both;
+  color:#ffffff;
+}
+.hero-title em{font-style:italic;color:var(--accent)}
+.hero-title .dim{color:var(--text2)}
+.hero-sub{
+  font-family:'Outfit',sans-serif;
+  font-size:clamp(16px,2vw,20px);
+  color:var(--text2);
+  max-width:560px;line-height:1.7;
+  margin:0 auto 48px;
+  animation:fadeUp 0.8s ease 0.2s both;
+  font-weight:400;
+}
+.hero-actions{
+  display:flex;align-items:center;gap:14px;flex-wrap:wrap;justify-content:center;
+  animation:fadeUp 0.8s ease 0.3s both;
+}
+.btn-hero{
+  padding:14px 32px;border-radius:10px;
+  font-family:'Outfit',sans-serif;
+  font-size:15px;font-weight:600;
+  text-decoration:none;transition:all 0.2s;
+  display:inline-flex;align-items:center;gap:8px;
+}
+.btn-hero-primary{background:var(--accent);color:#08090c}
+.btn-hero-primary:hover{background:var(--accent2);transform:translateY(-1px)}
+.btn-hero-outline{
+  background:transparent;color:#ffffff;
+  border:1px solid rgba(255,255,255,0.25);
+}
+.btn-hero-outline:hover{border-color:rgba(255,255,255,0.5);background:rgba(255,255,255,0.05)}
+.hero-stats{
+  display:flex;align-items:center;gap:40px;flex-wrap:wrap;justify-content:center;
+  margin-top:64px;padding-top:48px;
+  border-top:1px solid var(--border);
+  animation:fadeUp 0.8s ease 0.4s both;
+}
+.stat-item{text-align:center}
+.stat-num{
+  font-family:'DM Mono',monospace;
+  font-size:32px;font-weight:400;
+  color:var(--accent);line-height:1;
+}
+.stat-label{font-size:12px;color:var(--text3);margin-top:6px;letter-spacing:0.05em}
+.stat-sep{color:rgba(255,255,255,0.1);font-size:24px}
+@keyframes fadeUp{
+  from{opacity:0;transform:translateY(24px)}
+  to{opacity:1;transform:translateY(0)}
+}
+
+/* MARQUEE */
+.marquee-wrap{
+  overflow:hidden;
+  border-top:1px solid var(--border);
+  border-bottom:1px solid var(--border);
+  padding:14px 0;
+  background:var(--surface);
+  position:relative;z-index:1;
+}
+.marquee-track{
+  display:flex;gap:48px;
+  animation:marquee 25s linear infinite;
+  width:max-content;
+}
+.marquee-item{
+  display:flex;align-items:center;gap:10px;
+  font-size:12px;font-weight:600;letter-spacing:0.08em;
+  color:var(--text3);white-space:nowrap;text-transform:uppercase;
+}
+.marquee-dot{width:4px;height:4px;border-radius:50%;background:var(--accent);flex-shrink:0}
+@keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+/* SECTIONS */
+.section{
+  padding:100px 48px;
+  max-width:1200px;margin:0 auto;
+  position:relative;z-index:1;
+}
+.section-label{
+  font-family:'DM Mono',monospace;
+  font-size:11px;letter-spacing:0.15em;
+  color:var(--accent);text-transform:uppercase;
+  margin-bottom:16px;display:block;
+}
+.section-title{
+  font-family:'DM Serif Display',serif;
+  font-size:clamp(32px,5vw,56px);
+  letter-spacing:-2px;line-height:1.1;
+  margin-bottom:16px;color:#ffffff;
+}
+.section-title em{font-style:italic;color:var(--text2)}
+.section-sub{
+  font-size:16px;color:var(--text2);
+  max-width:480px;line-height:1.7;
+  margin-bottom:56px;
+}
+
+/* STEPS */
+.steps{
+  display:grid;grid-template-columns:repeat(4,1fr);
+  gap:1px;background:rgba(255,255,255,0.08);
+  border:1px solid rgba(255,255,255,0.08);
+  border-radius:16px;overflow:hidden;
+}
+.step{
+  background:#0f1015;padding:32px 28px;
+  transition:background 0.2s;
+}
+.step:hover{background:#13141c}
+.step-num{
+  font-family:'DM Mono',monospace;
+  font-size:11px;letter-spacing:0.1em;
+  color:var(--text3);margin-bottom:20px;
+}
+.step-icon{
+  width:44px;height:44px;border-radius:10px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:22px;margin-bottom:20px;
+  background:rgba(200,245,90,0.08);
+  border:1px solid rgba(200,245,90,0.2);
+}
+.step-title{font-size:16px;font-weight:600;margin-bottom:10px;color:#ffffff}
+.step-desc{font-size:13px;color:var(--text2);line-height:1.7}
+
+/* FEATURES */
+.features-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.feature-card{
+  background:#0f1015;
+  border:1px solid rgba(255,255,255,0.08);
+  border-radius:16px;padding:32px;
+  transition:all 0.2s;
+}
+.feature-card:hover{
+  border-color:rgba(200,245,90,0.2);
+  transform:translateY(-2px);
+}
+.feature-card.big{grid-column:span 2}
+.feature-icon{font-size:28px;margin-bottom:20px;display:block}
+.feature-title{font-size:18px;font-weight:600;margin-bottom:10px;color:#ffffff;letter-spacing:-0.3px}
+.feature-desc{font-size:14px;color:var(--text2);line-height:1.7}
+.feature-tags{display:flex;gap:8px;margin-top:20px;flex-wrap:wrap}
+.ftag{
+  padding:4px 12px;border-radius:20px;
+  font-size:12px;font-weight:500;
+  background:rgba(255,255,255,0.06);
+  color:var(--text2);
+  border:1px solid rgba(255,255,255,0.1);
+}
+
+/* PIPELINE */
+.pipeline{
+  display:flex;align-items:stretch;
+  background:#0f1015;
+  border:1px solid rgba(255,255,255,0.08);
+  border-radius:16px;overflow:hidden;
+  margin-top:56px;
+}
+.pipe-step{
+  flex:1;padding:28px 24px;
+  border-right:1px solid rgba(255,255,255,0.08);
+  transition:background 0.2s;
+}
+.pipe-step:last-child{border-right:none}
+.pipe-step:hover{background:rgba(255,255,255,0.02)}
+.pipe-num{
+  font-family:'DM Mono',monospace;
+  font-size:10px;letter-spacing:0.1em;
+  color:var(--text3);margin-bottom:12px;
+}
+.pipe-status{
+  display:inline-block;
+  padding:3px 10px;border-radius:20px;
+  font-size:11px;font-weight:600;
+  margin-bottom:10px;
+}
+.ps-pending{background:rgba(255,159,95,0.12);color:#ff9f5f;border:1px solid rgba(255,159,95,0.25)}
+.ps-short{background:rgba(184,126,255,0.12);color:#b87eff;border:1px solid rgba(184,126,255,0.25)}
+.ps-interview{background:rgba(95,159,255,0.12);color:#5f9fff;border:1px solid rgba(95,159,255,0.25)}
+.ps-accepted{background:rgba(200,245,90,0.12);color:#c8f55a;border:1px solid rgba(200,245,90,0.25)}
+.pipe-desc{font-size:12px;color:var(--text2);line-height:1.6}
+
+/* CTA */
+.cta-section{
+  margin:0 48px 100px;
+  background:#0f1015;
+  border:1px solid rgba(255,255,255,0.08);
+  border-radius:24px;padding:80px;
+  text-align:center;
+  position:relative;z-index:1;overflow:hidden;
+}
+.cta-section::before{
+  content:'';position:absolute;
+  top:-100px;left:50%;transform:translateX(-50%);
+  width:400px;height:400px;
+  background:radial-gradient(circle,rgba(200,245,90,0.06),transparent 70%);
+  pointer-events:none;
+}
+.cta-title{
+  font-family:'DM Serif Display',serif;
+  font-size:clamp(32px,5vw,60px);
+  letter-spacing:-2px;line-height:1.1;
+  margin-bottom:20px;color:#ffffff;
+}
+.cta-title em{font-style:italic;color:var(--accent)}
+.cta-sub{
+  font-size:16px;color:var(--text2);
+  max-width:400px;margin:0 auto 40px;line-height:1.7;
+}
+.cta-actions{display:flex;justify-content:center;gap:12px;flex-wrap:wrap}
+
+/* FOOTER */
+.land-footer{
+  background:var(--surface);
+  border-top:1px solid var(--border);
+  position:relative;z-index:1;
+}
+.land-footer-inner{
+  max-width:1200px;margin:0 auto;
+  padding:56px 48px 40px;
+  display:flex;gap:64px;align-items:flex-start;
+}
+.land-footer-brand{flex:1}
+.land-footer-logo{
+  font-family:'DM Serif Display',serif;
+  font-size:22px;color:var(--accent);
+  letter-spacing:-0.5px;margin-bottom:10px;
+}
+.land-footer-tagline{font-size:13px;color:var(--text3);line-height:1.6;max-width:200px}
+.land-footer-links{display:flex;gap:56px;flex-wrap:wrap}
+.land-footer-col{display:flex;flex-direction:column;gap:12px}
+.land-footer-col-title{
+  font-family:'DM Mono',monospace;
+  font-size:10px;letter-spacing:0.15em;
+  text-transform:uppercase;color:var(--text3);
+  margin-bottom:4px;
+}
+.land-footer-col a{
+  font-size:13px;color:var(--text2);
+  text-decoration:none;transition:color 0.2s;
+}
+.land-footer-col a:hover{color:#ffffff}
+.land-footer-info{font-size:13px;color:var(--text3)}
+.land-footer-bottom{
+  max-width:1200px;margin:0 auto;
+  padding:20px 48px;
+  border-top:1px solid rgba(255,255,255,0.06);
+  display:flex;justify-content:space-between;
+  align-items:center;gap:20px;flex-wrap:wrap;
+  font-size:12px;color:var(--text3);
+  font-family:'DM Mono',monospace;
+}
+.land-footer-disclaimer{color:var(--text3);max-width:480px;text-align:right;line-height:1.5}
+
+/* REVEAL */
+.reveal{opacity:0;transform:translateY(28px);transition:all 0.7s cubic-bezier(0.4,0,0.2,1)}
+.reveal.visible{opacity:1;transform:translateY(0)}
+
+/* RESPONSIVE */
+@media(max-width:900px){
+  nav{padding:0 20px}
+  .hero{padding:100px 20px 60px}
+  .hero-stats{gap:20px}
+  .steps{grid-template-columns:1fr 1fr}
+  .features-grid{grid-template-columns:1fr}
+  .feature-card.big{grid-column:span 1}
+  .pipeline{flex-direction:column}
+  .pipe-step{border-right:none;border-bottom:1px solid rgba(255,255,255,0.08)}
+  .pipe-step:last-child{border-bottom:none}
+  .section{padding:60px 20px}
+  .cta-section{margin:0 20px 60px;padding:48px 24px}
+  .land-footer-inner{flex-direction:column;gap:32px;padding:40px 20px 24px}
+  .land-footer-links{gap:32px}
+  .land-footer-bottom{flex-direction:column;text-align:center;padding:16px 20px}
+  .land-footer-disclaimer{text-align:center}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a class="nav-logo" href="#">CollabSpace <span>/ find your team</span></a>
+  <div class="nav-links">
+    <a class="nav-link" href="#how">How it works</a>
+    <a class="nav-link" href="#features">Features</a>
+    <a class="nav-link" href="{% url 'login' %}">Sign in</a>
+    <a class="nav-cta" href="{% url 'register' %}">Get started →</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-glow"></div>
+  <div class="hero-eyebrow">
+    <span class="eyebrow-dot"></span>
+    Now open for beta — join free
+  </div>
+  <h1 class="hero-title">
+    Build something<br>
+    <em>real</em> <span class="dim">together.</span>
+  </h1>
+  <p class="hero-sub">CollabSpace connects project creators with talented collaborators. Post your idea, find your team — and ship it.</p>
+  <div class="hero-actions">
+    <a class="btn-hero btn-hero-primary" href="{% url 'register' %}">Start for free →</a>
+    <a class="btn-hero btn-hero-outline" href="{% url 'login' %}">Sign in</a>
+  </div>
+  <div class="hero-stats">
+    <div class="stat-item">
+      <div class="stat-num">∞</div>
+      <div class="stat-label">Roles to apply for</div>
+    </div>
+    <div class="stat-sep">·</div>
+    <div class="stat-item">
+      <div class="stat-num">1</div>
+      <div class="stat-label">Account for everything</div>
+    </div>
+    <div class="stat-sep">·</div>
+    <div class="stat-item">
+      <div class="stat-num">0</div>
+      <div class="stat-label">Platform fees</div>
+    </div>
+    <div class="stat-sep">·</div>
+    <div class="stat-item">
+      <div class="stat-num">100%</div>
+      <div class="stat-label">Student friendly</div>
+    </div>
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<div class="marquee-wrap">
+  <div class="marquee-track">
+    <div class="marquee-item"><span class="marquee-dot"></span>Post a project</div>
+    <div class="marquee-item"><span class="marquee-dot"></span>Find collaborators</div>
+    <div class="marquee-item"><span class="marquee-dot"></span>Apply to roles</div>
+    <div class="marquee-item"><span class="marquee-dot"></span>Schedule interviews</div>
+    <div class="marquee-item"><span class="marquee-dot"></span>Build together</div>
+    <div class="marquee-item"><span class="marquee-dot"></span>Tech and Non-tech</div>
+    <div class="marquee-item"><span class="marquee-dot"></span>Paid and Unpaid</div>
+    <div class="marquee-item"><span class="marquee-dot"></span>Full-time and Part-time</div>
+    <div class="marquee-item"><span class="marquee-dot"></span>Post a project</div>
+    <div class="marquee-item"><span class="marquee-dot"></span>Find collaborators</div>
+    <div class="marquee-item"><span class="marquee-dot"></span>Apply to roles</div>
+    <div class="marquee-item"><span class="marquee-dot"></span>Schedule interviews</div>
+    <div class="marquee-item"><span class="marquee-dot"></span>Build together</div>
+    <div class="marquee-item"><span class="marquee-dot"></span>Tech and Non-tech</div>
+    <div class="marquee-item"><span class="marquee-dot"></span>Paid and Unpaid</div>
+    <div class="marquee-item"><span class="marquee-dot"></span>Full-time and Part-time</div>
+  </div>
+</div>
+
+<!-- HOW IT WORKS -->
+<div class="section" id="how">
+  <div class="reveal">
+    <span class="section-label">How it works</span>
+    <h2 class="section-title">Four steps to your<br><em>dream team</em></h2>
+    <p class="section-sub">From idea to collaboration in minutes. No gatekeeping, no fees, no drama.</p>
+  </div>
+  <div class="steps reveal">
+    <div class="step">
+      <div class="step-num">01 / 04</div>
+      <div class="step-icon">✍️</div>
+      <div class="step-title">Post your project</div>
+      <div class="step-desc">Describe what you're building, set the duration, choose categories, and list the roles you need — as many as you want.</div>
+    </div>
+    <div class="step">
+      <div class="step-num">02 / 04</div>
+      <div class="step-icon">🔍</div>
+      <div class="step-title">Browse and discover</div>
+      <div class="step-desc">Search and filter projects by type, pay, time commitment, and more. Find what genuinely excites you.</div>
+    </div>
+    <div class="step">
+      <div class="step-num">03 / 04</div>
+      <div class="step-icon">📩</div>
+      <div class="step-title">Apply to a role</div>
+      <div class="step-desc">Write a cover letter, upload your resume, and apply to the specific role that fits your skills perfectly.</div>
+    </div>
+    <div class="step">
+      <div class="step-num">04 / 04</div>
+      <div class="step-icon">🤝</div>
+      <div class="step-title">Get accepted</div>
+      <div class="step-desc">Go through shortlisting and an interview. Once accepted, both sides get each other's contact details.</div>
+    </div>
+  </div>
+
+  <div class="pipeline reveal">
+    <div class="pipe-step">
+      <div class="pipe-num">STAGE 01</div>
+      <div class="pipe-status ps-pending">Pending</div>
+      <div class="pipe-desc">Application submitted and waiting for creator review</div>
+    </div>
+    <div class="pipe-step">
+      <div class="pipe-num">STAGE 02</div>
+      <div class="pipe-status ps-short">Shortlisted</div>
+      <div class="pipe-desc">Creator liked your profile — contact details shared to prepare for interview</div>
+    </div>
+    <div class="pipe-step">
+      <div class="pipe-num">STAGE 03</div>
+      <div class="pipe-status ps-interview">Interview Scheduled</div>
+      <div class="pipe-desc">Date, time and meeting link sent directly to your email</div>
+    </div>
+    <div class="pipe-step">
+      <div class="pipe-num">STAGE 04</div>
+      <div class="pipe-status ps-accepted">Accepted ✓</div>
+      <div class="pipe-desc">Both parties receive full contact details. Time to build something great!</div>
+    </div>
+  </div>
+</div>
+
+<!-- FEATURES -->
+<div class="section" id="features" style="padding-top:0">
+  <div class="reveal">
+    <span class="section-label">Features</span>
+    <h2 class="section-title">Everything you need,<br><em>nothing you don't</em></h2>
+    <p class="section-sub">Built for students, developers, and creators who want to collaborate without the noise.</p>
+  </div>
+  <div class="features-grid reveal">
+    <div class="feature-card big">
+      <span class="feature-icon">⚡</span>
+      <div class="feature-title">One account, two roles</div>
+      <div class="feature-desc">You're not just a creator or just an applicant — you're both. Post your own project and apply to others at the same time, all from a single unified dashboard. Your posted projects and your applications live side by side, always in one place.</div>
+      <div class="feature-tags">
+        <span class="ftag">Unified dashboard</span>
+        <span class="ftag">Post and apply</span>
+        <span class="ftag">No switching accounts</span>
+      </div>
+    </div>
+    <div class="feature-card">
+      <span class="feature-icon">🎯</span>
+      <div class="feature-title">Role-specific applications</div>
+      <div class="feature-desc">You don't apply to a whole project — you apply to a specific role. Frontend Dev, UI/UX Designer, Data Analyst. Your application goes exactly where it belongs.</div>
+      <div class="feature-tags">
+        <span class="ftag">Targeted</span>
+        <span class="ftag">Precise</span>
+      </div>
+    </div>
+    <div class="feature-card">
+      <span class="feature-icon">📅</span>
+      <div class="feature-title">Built-in interview pipeline</div>
+      <div class="feature-desc">Shortlist candidates, schedule interviews with date, time, and a Google Meet link — all from within the platform. Applicants get notified by email at every single stage.</div>
+      <div class="feature-tags">
+        <span class="ftag">Email alerts</span>
+        <span class="ftag">Interview scheduling</span>
+      </div>
+    </div>
+    <div class="feature-card">
+      <span class="feature-icon">🔒</span>
+      <div class="feature-title">Privacy by design</div>
+      <div class="feature-desc">Contact details — email and phone — are hidden until a creator accepts an applicant. No unsolicited contact. No spam. Just meaningful connections at the right moment.</div>
+      <div class="feature-tags">
+        <span class="ftag">Secure</span>
+        <span class="ftag">Anti-spam</span>
+      </div>
+    </div>
+    <div class="feature-card">
+      <span class="feature-icon">🔍</span>
+      <div class="feature-title">Smart search and filters</div>
+      <div class="feature-desc">Search by keyword and filter by Tech / Non-tech, Paid / Unpaid, Part-time / Full-time. Find exactly the kind of project you're looking for in seconds.</div>
+      <div class="feature-tags">
+        <span class="ftag">6 filter types</span>
+        <span class="ftag">Keyword search</span>
+      </div>
+    </div>
+    <div class="feature-card">
+      <span class="feature-icon">📄</span>
+      <div class="feature-title">Resume per application</div>
+      <div class="feature-desc">Upload a fresh, tailored resume for each application — different from your profile resume. Because every role deserves your best, most relevant version.</div>
+      <div class="feature-tags">
+        <span class="ftag">PDF upload</span>
+        <span class="ftag">Per-role resumes</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CTA -->
+<div class="cta-section reveal">
+  <span class="section-label" style="display:block;margin-bottom:20px">Ready to start?</span>
+  <h2 class="cta-title">Your next project<br>is waiting for <em>you.</em></h2>
+  <p class="cta-sub">Join CollabSpace today. Post a project, apply to a role, and build something real.</p>
+  <div class="cta-actions">
+    <a class="btn-hero btn-hero-primary" href="{% url 'register' %}">Create free account →</a>
+    <a class="btn-hero btn-hero-outline" href="{% url 'login' %}">Sign in</a>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer class="land-footer">
+  <div class="land-footer-inner">
+    <div class="land-footer-brand">
+      <div class="land-footer-logo">CollabSpace</div>
+      <div class="land-footer-tagline">Find your team. Build something real. Ship it together.</div>
+    </div>
+    <div class="land-footer-links">
+      <div class="land-footer-col">
+        <div class="land-footer-col-title">Platform</div>
+        <a href="{% url 'browse_projects' %}">Browse projects</a>
+        <a href="{% url 'create_project' %}">Post a project</a>
+        <a href="{% url 'my_applications' %}">My applications</a>
+        <a href="{% url 'dashboard' %}">Dashboard</a>
+      </div>
+      <div class="land-footer-col">
+        <div class="land-footer-col-title">Account</div>
+        <a href="{% url 'login' %}">Sign in</a>
+        <a href="{% url 'register' %}">Register free</a>
+      </div>
+      <div class="land-footer-col">
+        <div class="land-footer-col-title">Built with</div>
+        <span class="land-footer-info">Django 6.0.3</span>
+        <span class="land-footer-info">Python 3.14</span>
+        <span class="land-footer-info">SQLite</span>
+        <span class="land-footer-info">Vanilla JS</span>
+      </div>
+    </div>
+  </div>
+  <div class="land-footer-bottom">
+    <span>© 2025 CollabSpace — A course project</span>
+    <span class="land-footer-disclaimer">This platform is a mediator only. Not responsible for payments, work quality, or disputes between users.</span>
+  </div>
+</footer>
+
+<script>
+const reveals = document.querySelectorAll('.reveal');
+const observer = new IntersectionObserver(entries => {
+  entries.forEach((e, i) => {
+    if (e.isIntersecting) {
+      setTimeout(() => e.target.classList.add('visible'), i * 100);
+    }
+  });
+}, {threshold: 0.08});
+reveals.forEach(r => observer.observe(r));
+</script>
+</body>
+</html>
